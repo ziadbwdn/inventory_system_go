@@ -21,6 +21,7 @@ A RESTful API for inventory management built with Go, Gin framework, and MySQL.
 /inventory-system  
   ├── database/          # Database configuration and queries
   │   └── scripts/       # SQL scripts for database setup
+  ├── docs/              # documentation
   ├── handlers/          # Gin route logic  
   ├── models/            # Structs (Product, Inventory, Order)  
   ├── routes/            # Gin router groups  
