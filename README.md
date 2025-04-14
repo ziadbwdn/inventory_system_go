@@ -207,10 +207,3 @@ For high-volume applications, consider:
 2. **Load Balancing**: Deploy multiple API instances behind a load balancer
 3. **Caching**: Implement Redis caching for frequently accessed data
 4. **Partitioning**: Consider table partitioning for very large datasets
-
-
-### Inventory Dashboard
-![Inventory Dashboard](uploads/screenshots/inventory.png)
-
-### Order Processing
-![Order Processing](uploads/screenshots/orders.png)
