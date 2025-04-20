@@ -1,1 +1,1 @@
-function dor image handling 
+function for image handling 
