@@ -18,16 +18,31 @@ A RESTful API for inventory management built with Go, Gin framework, and MySQL.
 ## Project Structure
 
 ```
-/inventory-system  
-  ├── database/          # Database configuration and queries
-  │   └── scripts/       # SQL scripts for database setup
-  ├── docs/              # documentation
-  ├── handlers/          # Gin route logic  
-  ├── models/            # Structs (Product, Inventory, Order)  
-  ├── routes/            # Gin router groups  
-  ├── uploads/           # Product images  
-  ├── go.mod             # Dependencies (Gin, GORM, MySQL driver)  
-  └── README.md          # This file  
+/inventory_system_go
+├── database/            # Database configuration and queries
+│   ├── db.go
+│   ├── queries.go
+│   └── scripts/
+│       └── schema.sql
+├── docs/
+│   └── documentation.pdf
+├── handlers/            # Gin route logic
+│   ├── inventory_handlers.go
+│   ├── order_handlers.go
+│   ├── product_handlers.go
+│   └── image_handlers.go
+├── main.go
+├── models/              # Structs (Product, Inventory, Order)
+│   └── models.go
+├── routes/              # Gin router groups
+│   └── router.go
+├── uploads/             # Product images
+│   └── products/
+├── utils/               # Utility functions
+│   └── file_utils.go
+├── go.mod               # Dependencies (Gin, GORM, MySQL driver)
+├── go.sum
+└── README.md            # This file
 ```
 
 ## Database Setup
@@ -189,6 +204,77 @@ curl -X POST http://localhost:8080/orders \
 ```bash
 curl -X GET http://localhost:8080/orders/revenue
 ```
+
+## File Upload/Download Workflow
+
+```
+┌─────────────┐         ┌──────────────┐         ┌────────────────┐
+│ Client      │         │ API Server   │         │ File System    │
+│             ├─────────┤              ├─────────┤                │
+│             │         │              │         │                │
+└─────────────┘         └──────────────┘         └────────────────┘
+      │                        │                         │
+      │  1. Upload Request     │                         │
+      │───────────────────────>│                         │
+      │                        │  2. Validate File       │
+      │                        │  & Product ID           │
+      │                        │                         │
+      │                        │  3. Save File           │
+      │                        │────────────────────────>│
+      │                        │                         │
+      │                        │  4. Store Path in DB    │
+      │                        │                         │
+      │  5. Return Success     │                         │
+      │<───────────────────────│                         │
+      │                        │                         │
+      │  6. Get Image Request  │                         │
+      │───────────────────────>│                         │
+      │                        │  7. Retrieve File Path  │
+      │                        │                         │
+      │                        │  8. Read File           │
+      │                        │<────────────────────────│
+      │  9. Return Image       │                         │
+      │<───────────────────────│                         │
+      │                        │                         │
+```
+
+## Example Requests
+
+### Upload Product Image
+
+```bash
+curl -X POST -F "image=@/path/to/image.jpg" http://localhost:8080/products/123/upload
+```
+
+### Get Product Image
+
+```bash
+curl -X GET http://localhost:8080/products/123/image -o product_image.jpg
+```
+
+## Security Features
+
+- MIME type validation (not just file extension)
+- File size limitation (max 5MB)
+- Path traversal prevention
+- Secure file storage structure
+- Automatic cleanup of orphaned images
+
+## Error Handling
+
+The API returns appropriate HTTP status codes and JSON error messages:
+
+- 400 Bad Request: Invalid input or file type
+- 404 Not Found: Product not found
+- 413 Request Entity Too Large: File too large
+- 500 Internal Server Error: Server-side issues
+
+## Dependencies
+
+- Gin Web Framework
+- GORM ORM
+- UUID Generator
+- MySQL Driver (or your chosen database)
 
 ## Database Optimization
 
