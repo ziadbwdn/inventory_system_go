@@ -2,7 +2,7 @@
 -- Run this script to set up the database from scratch
 
 -- Create database if it doesn't exist
-CREATE DATABASE IF NOT EXISTS inventory;
+CREATE DATABASE IF NOT EXISTS inventory_go;
 USE inventory;
 
 -- Products table
@@ -44,6 +44,8 @@ CREATE TABLE IF NOT EXISTS orders (
 
 -- Create index on order_date for faster date range queries
 CREATE INDEX idx_orders_date ON orders(order_date);
+
+
 
 -- Sample data insertion
 -- See seedData() function in Go code for implementation

@@ -3,10 +3,9 @@ package handlers
 
 import (
 	"inventory_system/models"
+	"inventory_system/utils"
 	"net/http"
-	"path/filepath"
 	"strconv"
-
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -158,6 +157,7 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context) {
 }
 
 // UploadProductImage handles file uploads for product images
+/**
 func (h *ProductHandler) UploadProductImage(c *gin.Context) {
 	id := c.Param("id")
 	var product models.Product
@@ -217,6 +217,7 @@ func (h *ProductHandler) GetProductImage(c *gin.Context) {
 
 	c.File(product.ImagePath)
 }
+*/
 
 // Utility function to validate product category
 func isValidCategory(category string) bool {
@@ -228,3 +229,67 @@ func isValidCategory(category string) bool {
 	}
 	return false
 }
+
+// DeleteProduct deletes a product and its associated images
+func (h *ProductHandler) DeleteProduct(c *gin.Context) {
+    // Parse product ID from URL
+    productID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+        return
+    }
+
+    // Check if product exists
+    var product models.Product
+    if err := h.DB.First(&product, productID).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+        return
+    }
+
+    // Delete associated images
+    if err := utils.DeleteProductImages(uint(productID)); err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product images"})
+        return
+    }
+
+    // Delete the product from database
+    if err := h.DB.Delete(&product).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "Product and associated images deleted successfully"})
+}
+
+/**
+// Modify the existing DeleteProduct handler to also delete associated images
+func DeleteProduct(c *gin.Context) {
+	// Parse product ID from URL
+	productID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		return
+	}
+
+	// Check if product exists
+	var product models.Product
+	if err := database.DB.First(&product, productID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+		return
+	}
+
+	// Delete associated images
+	if err := utils.DeleteProductImages(uint(productID)); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product images"})
+		return
+	}
+
+	// Delete the product from database
+	if err := database.DB.Delete(&product).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Product and associated images deleted successfully"})
+}
+*/

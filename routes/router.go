@@ -3,8 +3,9 @@ package routes
 
 import (
 	"inventory_system/handlers"
+	"inventory_system/utils"
 	"net/http"
-
+	"log"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -31,6 +32,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	productHandler := &handlers.ProductHandler{DB: db}
 	inventoryHandler := &handlers.InventoryHandler{DB: db}
 	orderHandler := &handlers.OrderHandler{DB: db}
+	imageHandler := &handlers.ImageHandler{DB: db}
 
 	// Static file serving
 	r.Static("/uploads", "./uploads")
@@ -40,6 +42,11 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		c.JSON(http.StatusOK, gin.H{"status": "up"})
 	})
 
+	// test upload
+	r.GET("/test-upload", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "Test upload endpoint working"})
+	})
+
 	// Product routes
 	productRoutes := r.Group("/products")
 	{
@@ -47,8 +54,10 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		productRoutes.GET("/:id", productHandler.GetProduct)
 		productRoutes.POST("", productHandler.CreateProduct)
 		productRoutes.PUT("/:id", productHandler.UpdateProduct)
-		productRoutes.POST("/:id/upload", productHandler.UploadProductImage)
-		productRoutes.GET("/:id/image", productHandler.GetProductImage)
+
+	// Image upload/download routes with path traversal protection
+		productRoutes.POST("/:id/upload", utils.PathTraversalMiddleware(), imageHandler.UploadProductImage)
+		productRoutes.GET("/:id/image", utils.PathTraversalMiddleware(), imageHandler.DownloadProductImage)
 	}
 
 	// Inventory routes
@@ -68,6 +77,11 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		orderRoutes.POST("", orderHandler.CreateOrder)
 		orderRoutes.GET("/revenue", orderHandler.GetRevenueByCategory)
 	}
+
+	// Debug: Print all registered routes
+    for _, route := range r.Routes() {
+        log.Printf("Route registered: %s %s", route.Method, route.Path)
+    }
 
 	return r
 }

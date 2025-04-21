@@ -6,6 +6,8 @@ import (
 )
 
 // Product represents an item that can be sold
+
+/**
 type Product struct {
 	ID          uint      `json:"id" gorm:"primaryKey;type:int unsigned"`
 	Name        string    `json:"name" gorm:"size:100;not null"`
@@ -15,6 +17,19 @@ type Product struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 	ImagePath   string    `json:"image_path,omitempty" gorm:"size:255"`
+}
+*/
+
+type Product struct {
+    ID          uint      `json:"id" gorm:"primaryKey;type:int unsigned"`
+    Name        string    `json:"name" gorm:"type:varchar(100);not null"`
+    Description string    `json:"description" gorm:"type:text"`
+    Price       float64   `json:"price" gorm:"type:decimal(10,2);not null"`
+	Category    string    `json:"category" gorm:"size:50;not null"`
+    Stock       int       `json:"stock" gorm:"not null;default:0"`
+    ImagePath   string    `json:"image_path" gorm:"type:varchar(255)"`
+    CreatedAt   time.Time `json:"created_at"`
+    UpdatedAt   time.Time `json:"updated_at"`
 }
 
 // Inventory represents the stock of a product at a specific location
@@ -34,3 +49,4 @@ type Order struct {
 	OrderDate  time.Time `json:"order_date" gorm:"not null"`
 	TotalPrice float64   `json:"total_price" gorm:"type:decimal(10,2);not null"`
 }
+

@@ -21,7 +21,7 @@ func Initialize() *gorm.DB {
 	dbUser := getEnv("DB_USER", "root")
 	dbHost := getEnv("DB_HOST", "localhost")
 	dbPort := getEnv("DB_PORT", "3306")
-	dbName := getEnv("DB_NAME", "inventory_system")
+	dbName := getEnv("DB_NAME", "inventory_go")
 
 	var dbPassword string
 	fmt.Print("Enter database password: ") // Prompt the user

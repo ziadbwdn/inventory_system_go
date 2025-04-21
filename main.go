@@ -17,6 +17,11 @@ func main() {
 	// Initialize database
 	db := database.Initialize()
 
+	// Create uploads directory if it doesn't exist
+	if err := os.MkdirAll("./uploads/products", os.ModePerm); err != nil {
+		log.Fatalf("Failed to create uploads directory: %v", err)
+	}
+
 	// Setup router
 	r := routes.SetupRouter(db)
 
